@@ -5,10 +5,11 @@
 # Choix du compilateur :
 CC := g++
 # Options
-CPPFLAGS := -W -Wall -ansi -pedantic -O3
-LDFLAGS := -L/usr/local/lib -lwiringPi -lwiringPiDev 
+CPPFLAGS := -W -Wall -ansi -pedantic -O3 -std=c++0x
+LDFLAGS := -L/usr/local/lib -lwiringPi -lwiringPiDev
 SRC := i2cTest.cpp \
-		LcdDisplay/LcdDisplay.cpp
+		LcdDisplay/LcdDisplay.cpp \
+		Ds1621/Ds1621.cpp
 VPATH := $(dir $(SRC))
 BINDIR := bin
 OBJDIR := obj
@@ -36,24 +37,24 @@ $(BINDIR): $(OBJS)
 
 
 # -------------------------------------------------------------------
-#  regles de creation des dossiers 
+#  regles de creation des dossiers
 # -------------------------------------------------------------------
 .PHONY: dirobj dirbin
 # creation du dossier $(OBJDIR) si besoin :
 ifeq ($(strip $( $(wildcard $(OBJDIR)) ) ), )
-dirobj: 
+dirobj:
 	mkdir -p $(OBJDIR)/$(ARCH)
 else
-dirobj: 
-endif 
+dirobj:
+endif
 
 # creation du dossier $(BINDIR) si besoin :
 ifeq ($(strip $( $(wildcard $(BINDIR)) ) ), )
-dirbin: 
+dirbin:
 	mkdir -p $(BINDIR)
 else
-dirbin: 
-endif 
+dirbin:
+endif
 
 # -------------------------------------------------------------------
 #  regles de nettoyage
@@ -61,7 +62,7 @@ endif
 .PHONY: clean mrproper
 
 clean:
-	@rm -rf $(OBJDIR) 
+	@rm -rf $(OBJDIR)
 
 mrproper: clean
 	@rm -rf $(BINDIR)

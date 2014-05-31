@@ -62,7 +62,10 @@ const unsigned char K_LCD_RW_MASK               = 0x02;
 // 0b00000001 Register select bit
 const unsigned char K_LCD_RS_MASK               = 0x01;
 
-class lcdDisplay{
+
+#define M_LCD_IS_DEVICE_UP						if(false == m_isDeviceInitialized) return;
+
+class LcdDisplay{
 	public:
 		//---------------------------------------------------
 		/**
@@ -70,14 +73,14 @@ class lcdDisplay{
 		  * @param szAddres is the I2C addres of the device
 		*/
 		//---------------------------------------------------
-		lcdDisplay(unsigned char szAddres);
+		LcdDisplay(unsigned char szAddres);
 
 		//---------------------------------------------------
 		/**
 		  * Destructor
 		*/
 		//---------------------------------------------------
-		virtual ~lcdDisplay();
+		virtual ~LcdDisplay();
 
 		//---------------------------------------------------
 		/**
@@ -86,6 +89,15 @@ class lcdDisplay{
 		*/
 		//---------------------------------------------------
 		void init();
+
+		//---------------------------------------------------
+		/**
+		  * isDeviceUp : 
+		  *
+		  * @return true if device was initialized
+		*/
+		//---------------------------------------------------
+		inline bool isDeviceUp(){ return m_isDeviceInitialized;}
 
 		//---------------------------------------------------
 		/**
@@ -121,6 +133,9 @@ class lcdDisplay{
 		void setCursorAtPosition(char szLine, char szCol,bool isVisible, bool isBlinking);
 
 	private:
+		// Flag to know if operations are valid or not
+		bool m_isDeviceInitialized;
+
 		// I2C Addres of the device
 		unsigned char m_szAddres;
 
@@ -177,4 +192,15 @@ class lcdDisplay{
 		 */
 		//---------------------------------------------------
 		void displayString(const char* pData);
+
+		//---------------------------------------------------
+		/**
+		  * writei2c : write at low level
+		  *
+		  * @param szData is the data to write
+		  *
+		*/
+		//---------------------------------------------------
+		void writei2c(unsigned char szData);
+
 };

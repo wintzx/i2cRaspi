@@ -25,75 +25,9 @@
   * Interface is done with a PCF8574
 */
 //---------------------------------------------------
-lcdDisplay::lcdDisplay(unsigned char szAddres){
+LcdDisplay::LcdDisplay(unsigned char szAddres){
 	m_szAddres = szAddres;
-}
-
-//---------------------------------------------------
-/**
-  * init : Init LCD
-  *
-  * @return true if device is present and ready
-*/
-//---------------------------------------------------
-void lcdDisplay::init(){
-	// Setup the device
-	m_nDeviceFD = wiringPiI2CSetup (m_szAddres) ;
-	sleep(0.2);
-	if( -1 == m_nDeviceFD){
-		throw std::runtime_error("Error when initializing device");
-	}
-
-	// Init pattern
-	// Function set 0011XXXX,
-	write(0x03);
-	// Wait 4,1ms
-	usleep(4100);
-	// Function set 0011XXXX,
-	write(0x03);
-	// Wait 100µs
-	usleep(100);
-	// Function set 0011XXXX,
-	write(0x03);
-
-	// Activate 4 bits mode
-	write(0x02);
-
-	// Function SET
-	// 0    0   1   DL  N   F   -   -
-	// DL   = 1 → 8 bits Interface
-	// DL   = 0 → 4 bits Interface
-	// N    = 1 → 2 display lines
-	// N    = 0 → 1 display line
-	// F    = 1 → 5 x 11 dots matrix
-	// F    = 0 → 5 x 8 dots matrix
-	// Here we set 4 bits mode, 5x8 matrix and 2 lines display
-	write(K_LCD_FUNCTIONSET | K_LCD_2LINE | K_LCD_5x8DOTS | K_LCD_4BITMODE);
-
-	// Display on/off control
-	// 0    0   0   0   1   D   C   B
-	// D = 1 → Enable display
-	// D = 0 → Disable display
-	// C = 1 → Enable cursor
-	// C = 0 → Disable cursor
-	// B = 1 → Blinking cursor
-	// B = 0 → Fixed cursor
-	// Here we just enable display
-	write(K_LCD_DISPLAYCONTROL | K_LCD_DISPLAYON);
-
-	// Clear display
-	// 0    0   0   0   0   0   0   1
-	write(K_LCD_CLEARDISPLAY);
-
-	// Entry set mode
-	// 0    0   0   0   0   1   I/D     S
-	// I/D  = 1 → Adress counter incrementation (move cursor one position right)
-	// I/D  = 0 → Adress counter decrementation (move cursor one position left)
-	// S    = 1 → Shift display to the cursor direction
-	// S    = 0 → Display is not shifted
-	// Here we set the cursor to be moved on the right with no display shifting
-	write(K_LCD_ENTRYMODESET | K_LCD_ENTRYRIGHT);
-	usleep(2000);
+	m_isDeviceInitialized = false;
 }
 
 //---------------------------------------------------
@@ -101,7 +35,76 @@ void lcdDisplay::init(){
   * Destructor
 */
 //---------------------------------------------------
-lcdDisplay::~lcdDisplay(){
+LcdDisplay::~LcdDisplay(){
+}
+
+//---------------------------------------------------
+/**
+  * init : Init LCD
+  *
+*/
+//---------------------------------------------------
+void LcdDisplay::init(){
+	// Setup the device
+	m_nDeviceFD = wiringPiI2CSetup (m_szAddres) ;
+	if( -1 != m_nDeviceFD){
+		try{
+			// Init pattern
+			// Function set 0011XXXX,
+			write(0x03);
+			// Wait 4,1ms
+			usleep(4100);
+			// Function set 0011XXXX,
+			write(0x03);
+			// Wait 100µs
+			usleep(100);
+			// Function set 0011XXXX,
+			write(0x03);
+
+			// Activate 4 bits mode
+			write(0x02);
+
+			// Function SET
+			// 0    0   1   DL  N   F   -   -
+			// DL   = 1 → 8 bits Interface
+			// DL   = 0 → 4 bits Interface
+			// N    = 1 → 2 display lines
+			// N    = 0 → 1 display line
+			// F    = 1 → 5 x 11 dots matrix
+			// F    = 0 → 5 x 8 dots matrix
+			// Here we set 4 bits mode, 5x8 matrix and 2 lines display
+			write(K_LCD_FUNCTIONSET | K_LCD_2LINE | K_LCD_5x8DOTS | K_LCD_4BITMODE);
+
+			// Display on/off control
+			// 0    0   0   0   1   D   C   B
+			// D = 1 → Enable display
+			// D = 0 → Disable display
+			// C = 1 → Enable cursor
+			// C = 0 → Disable cursor
+			// B = 1 → Blinking cursor
+			// B = 0 → Fixed cursor
+			// Here we just enable display
+			write(K_LCD_DISPLAYCONTROL | K_LCD_DISPLAYON);
+
+			// Clear display
+			// 0    0   0   0   0   0   0   1
+			write(K_LCD_CLEARDISPLAY);
+
+			// Entry set mode
+			// 0    0   0   0   0   1   I/D     S
+			// I/D  = 1 → Adress counter incrementation (move cursor one position right)
+			// I/D  = 0 → Adress counter decrementation (move cursor one position left)
+			// S    = 1 → Shift display to the cursor direction
+			// S    = 0 → Display is not shifted
+			// Here we set the cursor to be moved on the right with no display shifting
+			write(K_LCD_ENTRYMODESET | K_LCD_ENTRYRIGHT);
+
+			usleep(2000);
+			m_isDeviceInitialized = true;
+		}catch(std::exception const& e){
+			printf("[LCD] %s\n",e.what());
+		}
+	}
 }
 
 //---------------------------------------------------
@@ -110,7 +113,11 @@ lcdDisplay::~lcdDisplay(){
   *
 */
 //---------------------------------------------------
-void lcdDisplay::cls(){
+void LcdDisplay::cls(){
+
+	// Sanity check
+	M_LCD_IS_DEVICE_UP
+
 	write(K_LCD_CLEARDISPLAY);
 	write(K_LCD_RETURNHOME);
 }
@@ -125,7 +132,11 @@ void lcdDisplay::cls(){
   *
 */
 //---------------------------------------------------
-void lcdDisplay::displayStringAtPosition(const char* pData, char szLine, char szCol){
+void LcdDisplay::displayStringAtPosition(const char* pData, char szLine, char szCol){
+	
+	// Sanity check
+	M_LCD_IS_DEVICE_UP
+	
 	setCursorAtPosition(szLine,szCol,false,false);
 	displayString(pData);
 }
@@ -141,9 +152,12 @@ void lcdDisplay::displayStringAtPosition(const char* pData, char szLine, char sz
   *
 */
 //---------------------------------------------------
-void lcdDisplay::setCursorAtPosition(char szLine, char szCol,bool isVisible, bool isBlinking){
+void LcdDisplay::setCursorAtPosition(char szLine, char szCol,bool isVisible, bool isBlinking){
 	unsigned char cmdArg;
 
+	// Sanity check
+	M_LCD_IS_DEVICE_UP
+	
 	if(true == isVisible){
 		cmdArg = K_LCD_CURSORON;
 	}else{
@@ -183,7 +197,7 @@ void lcdDisplay::setCursorAtPosition(char szLine, char szCol,bool isVisible, boo
   *
 */
 //---------------------------------------------------
-void lcdDisplay::write(char szData, char szMode){
+void LcdDisplay::write(char szData, char szMode){
 	// Write Hi Nibble
 	writeNibble(szMode | (szData & 0xF0));
 	// Write Low Nibble
@@ -198,14 +212,9 @@ void lcdDisplay::write(char szData, char szMode){
   *
 */
 //---------------------------------------------------
-void lcdDisplay::writeNibble(char szData){
-	int nRes;
-	nRes = wiringPiI2CWrite(m_nDeviceFD,szData | K_LCD_BACKLIGHT);
-	if(0 != nRes){
-		throw std::runtime_error("[Error] writeNibble error");
-	}else{
-		strobe(szData);
-	}
+void LcdDisplay::writeNibble(char szData){
+	writei2c(szData | K_LCD_BACKLIGHT);
+	strobe(szData);
 }
 
 //---------------------------------------------------
@@ -216,21 +225,11 @@ void lcdDisplay::writeNibble(char szData){
   *
 */
 //---------------------------------------------------
-void lcdDisplay::strobe(char szData){
-	bool isRes = false;
-	int nRes;
-	nRes = wiringPiI2CWrite(m_nDeviceFD,szData | K_LCD_EN_MASK | K_LCD_BACKLIGHT);
-	if(0 == nRes){
-		usleep(500);
-		nRes = wiringPiI2CWrite(m_nDeviceFD,((szData & ~K_LCD_EN_MASK) | K_LCD_BACKLIGHT));
-		usleep(100);
-		if(0 == nRes){
-			isRes = true;
-		}
-	}
-	if(false == isRes){
-		throw std::runtime_error("[Error] strobe was not done");
-	}
+void LcdDisplay::strobe(char szData){
+	writei2c(szData | K_LCD_EN_MASK | K_LCD_BACKLIGHT);
+	usleep(800);
+	writei2c(((szData & ~K_LCD_EN_MASK) | K_LCD_BACKLIGHT));
+	usleep(400);
 }
 
 //---------------------------------------------------
@@ -241,7 +240,7 @@ void lcdDisplay::strobe(char szData){
   *
 */
 //---------------------------------------------------
-void lcdDisplay::setLinePosition(char szLine){
+void LcdDisplay::setLinePosition(char szLine){
 	char szCmdLine;
 
 	switch(szLine){
@@ -276,7 +275,7 @@ void lcdDisplay::setLinePosition(char szLine){
   *
 */
 //---------------------------------------------------
-void lcdDisplay::displayString(const char* pData){
+void LcdDisplay::displayString(const char* pData){
 	if(NULL != pData){
 		int nIndex = 0;
 		while((0 != pData[nIndex]) && (nIndex < K_LCD_MAX_CHAR_PER_LINE)){
@@ -285,5 +284,21 @@ void lcdDisplay::displayString(const char* pData){
 		};
 	}else{
 		throw std::invalid_argument("[Error] NULL data");
+	}
+}
+
+//---------------------------------------------------
+/**
+  * writei2c : write at low level
+  *
+  * @param szData is the data to write
+  *
+*/
+//---------------------------------------------------
+void LcdDisplay::writei2c(unsigned char szData){
+	int nRes;
+	nRes = wiringPiI2CWrite(m_nDeviceFD,szData);
+	if(0 != nRes){
+		throw std::runtime_error("[Error] i2c write error");
 	}
 }
