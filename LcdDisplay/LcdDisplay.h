@@ -4,7 +4,10 @@
  * Project    : I2C
  * Sub-Project: LcdDisplay.h
  *
- * Copyright Patrick DELVENNE and ProcessUX 2014
+ * This code is distributed under the GNU Public License
+ * which can be found at http://www.gnu.org/licenses/gpl.txt
+ *
+ * Author Patrick DELVENNE and ProcessUX 2018
  *--------------------------------------------------------
  */
 
@@ -63,144 +66,144 @@ const unsigned char K_LCD_RW_MASK               = 0x02;
 const unsigned char K_LCD_RS_MASK               = 0x01;
 
 
-#define M_LCD_IS_DEVICE_UP						if(false == m_isDeviceInitialized) return;
+#define M_LCD_IS_DEVICE_UP                      if(false == m_isDeviceInitialized) return;
 
 class LcdDisplay{
-	public:
-		//---------------------------------------------------
-		/**
-		  * Constructor
-		  * @param szAddres is the I2C addres of the device
-		*/
-		//---------------------------------------------------
-		LcdDisplay(unsigned char szAddres);
+    public:
+        //---------------------------------------------------
+        /**
+          * Constructor
+          * @param szAddres is the I2C addres of the device
+        */
+        //---------------------------------------------------
+        LcdDisplay(unsigned char szAddres);
 
-		//---------------------------------------------------
-		/**
-		  * Destructor
-		*/
-		//---------------------------------------------------
-		virtual ~LcdDisplay();
+        //---------------------------------------------------
+        /**
+          * Destructor
+        */
+        //---------------------------------------------------
+        virtual ~LcdDisplay();
 
-		//---------------------------------------------------
-		/**
-		  * init : Init LCD
-		  *
-		*/
-		//---------------------------------------------------
-		void init();
+        //---------------------------------------------------
+        /**
+          * init : Init LCD
+          *
+        */
+        //---------------------------------------------------
+        void init();
 
-		//---------------------------------------------------
-		/**
-		  * isDeviceUp : 
-		  *
-		  * @return true if device was initialized
-		*/
-		//---------------------------------------------------
-		inline bool isDeviceUp(){ return m_isDeviceInitialized;}
+        //---------------------------------------------------
+        /**
+          * isDeviceUp :
+          *
+          * @return true if device was initialized
+        */
+        //---------------------------------------------------
+        inline bool isDeviceUp(){ return m_isDeviceInitialized;}
 
-		//---------------------------------------------------
-		/**
-		  * cls : clear lcd and set cursor to home
-		  *
-		*/
-		//---------------------------------------------------
-		void cls();
+        //---------------------------------------------------
+        /**
+          * cls : clear lcd and set cursor to home
+          *
+        */
+        //---------------------------------------------------
+        void cls();
 
-		//---------------------------------------------------
-		/**
-		  * displayStringAtPosition : display a string at the given position
-		  *
-		  * @param pData is the pointer the data to write
-		  * @param szLine is the line number
-		  * @param szCol is the colum number
-		  *
-		*/
-		//---------------------------------------------------
-		void displayStringAtPosition(const char* pData, char szLine, char szCol = 0);
+        //---------------------------------------------------
+        /**
+          * displayStringAtPosition : display a string at the given position
+          *
+          * @param pData is the pointer the data to write
+          * @param szLine is the line number
+          * @param szCol is the colum number
+          *
+        */
+        //---------------------------------------------------
+        void displayStringAtPosition(const char* pData, char szLine, char szCol = 0);
 
-		//---------------------------------------------------
-		/**
-		  * setCursorAtPosition : setCursor
-		  *
-		  * @param szLine is the line number
-		  * @param szCol is the colum number
-		  * @param isVisible if true, enable the cursor
-		  * @param isBlinking if true, enable cursor blinking
-		  *
-		*/
-		//---------------------------------------------------
-		void setCursorAtPosition(char szLine, char szCol,bool isVisible, bool isBlinking);
+        //---------------------------------------------------
+        /**
+          * setCursorAtPosition : setCursor
+          *
+          * @param szLine is the line number
+          * @param szCol is the colum number
+          * @param isVisible if true, enable the cursor
+          * @param isBlinking if true, enable cursor blinking
+          *
+        */
+        //---------------------------------------------------
+        void setCursorAtPosition(char szLine, char szCol,bool isVisible, bool isBlinking);
 
-	private:
-		// Flag to know if operations are valid or not
-		bool m_isDeviceInitialized;
+    private:
+        // Flag to know if operations are valid or not
+        bool m_isDeviceInitialized;
 
-		// I2C Addres of the device
-		unsigned char m_szAddres;
+        // I2C Addres of the device
+        unsigned char m_szAddres;
 
-		// File descriptor of the device
-		int m_nDeviceFD;
+        // File descriptor of the device
+        int m_nDeviceFD;
 
-		//---------------------------------------------------
-		/**
-		  * stobe : clocks EN to latch command
-		  *
-		  * @param szData is the data to write
-		  *
-		*/
-		//---------------------------------------------------
-		void strobe(char szData);
+        //---------------------------------------------------
+        /**
+          * stobe : clocks EN to latch command
+          *
+          * @param szData is the data to write
+          *
+        */
+        //---------------------------------------------------
+        void strobe(char szData);
 
-		//---------------------------------------------------
-		/**
-		  * writeNibble : write a nibble to the lcd
-		  *
-		  * @param szData is the data nibble to write
-		  *
-		*/
-		//---------------------------------------------------
-		void writeNibble(char szData);
+        //---------------------------------------------------
+        /**
+          * writeNibble : write a nibble to the lcd
+          *
+          * @param szData is the data nibble to write
+          *
+        */
+        //---------------------------------------------------
+        void writeNibble(char szData);
 
-		//---------------------------------------------------
-		/**
-		  * write : write a command to lcd
-		  *
-		  * @param szData is the command/data to write
-		  * @param szMode is the mode
-		  *
-		*/
-		//---------------------------------------------------
-		void write(char szData, char szMode=0);
+        //---------------------------------------------------
+        /**
+          * write : write a command to lcd
+          *
+          * @param szData is the command/data to write
+          * @param szMode is the mode
+          *
+        */
+        //---------------------------------------------------
+        void write(char szData, char szMode=0);
 
-		//---------------------------------------------------
-		/**
-		  * setLinePosition : Set the cursor at the given line position
-		  *
-		  * @param szLine is the line where to put the cursor
-		  *
-		*/
-		//---------------------------------------------------
-		void setLinePosition(char szLine);
+        //---------------------------------------------------
+        /**
+          * setLinePosition : Set the cursor at the given line position
+          *
+          * @param szLine is the line where to put the cursor
+          *
+        */
+        //---------------------------------------------------
+        void setLinePosition(char szLine);
 
-		//---------------------------------------------------
-		/**
-		  * displayString : display a string at the current cursor position
-		  *
-		  * @param pData is the pointer the data to write
-		  *
-		 */
-		//---------------------------------------------------
-		void displayString(const char* pData);
+        //---------------------------------------------------
+        /**
+          * displayString : display a string at the current cursor position
+          *
+          * @param pData is the pointer the data to write
+          *
+         */
+        //---------------------------------------------------
+        void displayString(const char* pData);
 
-		//---------------------------------------------------
-		/**
-		  * writei2c : write at low level
-		  *
-		  * @param szData is the data to write
-		  *
-		*/
-		//---------------------------------------------------
-		void writei2c(unsigned char szData);
+        //---------------------------------------------------
+        /**
+          * writei2c : write at low level
+          *
+          * @param szData is the data to write
+          *
+        */
+        //---------------------------------------------------
+        void writei2c(unsigned char szData);
 
 };

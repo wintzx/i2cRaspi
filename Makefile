@@ -6,10 +6,11 @@
 CC := g++
 # Options
 CPPFLAGS := -W -Wall -ansi -pedantic -O3 -std=c++0x
-LDFLAGS := -L/usr/local/lib -lwiringPi -lwiringPiDev
+LDFLAGS :=  -lwiringPiDev  -lwiringPi -lpthread -L/usr/local/lib
 SRC := i2cTest.cpp \
-		LcdDisplay/LcdDisplay.cpp \
-		Ds1621/Ds1621.cpp
+	LcdDisplay/LcdDisplay.cpp \
+	KS0108Display/KS0108Display.cpp \
+	Ds1621/Ds1621.cpp
 VPATH := $(dir $(SRC))
 BINDIR := bin
 OBJDIR := obj
@@ -33,7 +34,7 @@ $(OBJDIR)/$(ARCH)/%.o : %.cpp Makefile
 # This will make the cbsdk shared library
 $(BINDIR): $(OBJS)
 	@echo building output ...
-	$(CC) -o $(BINDIR)/$(EXEC) $(OBJS) $(LDFLAGS)
+	$(CC) -o $(BINDIR)/$(EXEC) $(LDFLAGS)  $(OBJS)
 
 
 # -------------------------------------------------------------------
