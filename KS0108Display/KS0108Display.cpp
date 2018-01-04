@@ -431,7 +431,11 @@ KS0108Display::setPixel(unsigned char szX, unsigned char szY, bool isVisible){
     setAddress(szX, (szY / K_KS0108_PAGES_PER_CTRL));
     szTmp = readData();
     setAddress(szX, (szY / K_KS0108_PAGES_PER_CTRL));
-    szTmp |= (1 << (szY % K_KS0108_PAGES_PER_CTRL));
+    if(true == isVisible){
+		szTmp |= (1 << (szY % K_KS0108_PAGES_PER_CTRL));
+	}else{
+		szTmp &= ~(1 << (szY % K_KS0108_PAGES_PER_CTRL));
+	}
     writeData(szTmp);
 }
 

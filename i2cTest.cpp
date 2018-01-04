@@ -101,7 +101,7 @@ int main (int argc, char *argv[]){
                     fprintf(stderr,"You must set -x, -y -X and -Y\n");
                     return -1;
                 }
-                pDis->drawRect(szX,szY,szdX, szdY);
+                pDis->drawRect(szY,szX,szdX,szdY);
             break;
 
             case 'l':
@@ -109,7 +109,7 @@ int main (int argc, char *argv[]){
                     fprintf(stderr,"You must set -x, -y -X and -Y\n");
                     return -1;
                 }
-                pDis->drawLine(szX,szY,szdX, szdY);
+                pDis->drawLine(szY,szX,szdX,szdY);
             break;
 
             case 'h':
