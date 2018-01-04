@@ -162,6 +162,16 @@ class KS0108Display{
         //---------------------------------------------------
         void drawBitmap(char *pData, unsigned char szX, unsigned char szY, unsigned char szDx, unsigned char szDy);
 
+        //---------------------------------------------------
+        /**
+          * setStartLine : Indicate the display data RAM displayed at the top of the screen
+          *
+          * @param szStart is the position in the line from 0 to 63
+          * @note All controllers are affected by this operation
+          *
+        */
+        //---------------------------------------------------
+        void setStartLine(unsigned char szStart);
 
     private:
         // Flag to know if operations are valid or not
@@ -282,17 +292,6 @@ class KS0108Display{
         */
         //---------------------------------------------------
         void setPageRegister(unsigned char szY);
-
-        //---------------------------------------------------
-        /**
-          * setStartLine : Indicate the display data RAM displayed at the top of the screen
-          *
-          * @param szStart is the position in the line from 0 to 63
-          * @note All controllers are affected by this operation
-          *
-        */
-        //---------------------------------------------------
-        void setStartLine(unsigned char szStart);
 
         //---------------------------------------------------
         /**

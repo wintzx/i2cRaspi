@@ -301,7 +301,7 @@ KS0108Display::drawBitmap(char *pData, unsigned char szX, unsigned char szY, uns
 
     // Sanity check
     M_KS0108_IS_DEVICE_UP
-    
+
     nIndex = 0;
     for(szJ = 0; szJ < szDy / K_KS0108_PAGES_PER_CTRL; szJ++){
         setAddress(szX,szY + szJ);
@@ -311,6 +311,31 @@ KS0108Display::drawBitmap(char *pData, unsigned char szX, unsigned char szY, uns
     }
 }
 
+//---------------------------------------------------
+/**
+  * setStartLine : Indicate the display data RAM displayed at the top of the screen
+  *
+  * @param szStart is the position in the line from 0 to 63
+  * @note All controllers are affected by this operation
+  *
+*/
+//---------------------------------------------------
+void
+KS0108Display::setStartLine(unsigned char szStart){
+    unsigned char szCtrl;
+
+    if(szStart < K_KS0108_X_PIXELS_PER_CTRL){
+        // Browse all controllers
+        for(szCtrl = 0; szCtrl < K_KS0108_NB_CTRL; szCtrl++){
+            // Indicate the display data RAM displayed at the top of the screen
+            // D7 D6 D5 D4 D3 D2 D1 D0
+            //  1  1  Y  Y  Y  Y  Y  Y
+            writeCommand(K_KS0108_DISPLAY_START_LINE | szStart , szCtrl);
+        }
+    }else{
+        throw std::invalid_argument("[Error] setStartLine start out of range [0-63]");
+    }
+}
 
 //************* PRIVATE SECTION *************************
 
@@ -327,20 +352,20 @@ void
 KS0108Display::drawChar(unsigned char szC, const unsigned char* pFont){
 
     unsigned char szI,szJ,szPage,szData;
-    unsigned char szX0		= m_szPosX;
-    unsigned char szY0		= m_szPosY;
-    unsigned char szWidth	= 0;
-    unsigned int nIndex 	= 0;
+    unsigned char szX0      = m_szPosX;
+    unsigned char szY0      = m_szPosY;
+    unsigned char szWidth   = 0;
+    unsigned int nIndex     = 0;
 
     // See font definition .h file for data struct
-    unsigned char szHeight 		= pFont[3];
-    unsigned char szBytes 		= (szHeight+7)/8;
-    unsigned char szFirstChar	= pFont[4];
-    unsigned char szCharCount 	= pFont[5];
+    unsigned char szHeight      = pFont[3];
+    unsigned char szBytes       = (szHeight+7)/8;
+    unsigned char szFirstChar   = pFont[4];
+    unsigned char szCharCount   = pFont[5];
 
-	if ((szC < szFirstChar) || (szC > szFirstChar + szCharCount)){
-		 return;
-	}
+    if ((szC < szFirstChar) || (szC > szFirstChar + szCharCount)){
+         return;
+    }
 
     szC -= szFirstChar;
 
@@ -441,7 +466,8 @@ void
 KS0108Display::displayString(const char* pData, const unsigned char *pFont){
     if(NULL != pData){
         unsigned char szIndex = 0;
-        while((0 != pData[szIndex]) && (szIndex < K_KS0108_MAX_TXT_COL)){
+        //while((0 != pData[szIndex]) && (szIndex < K_KS0108_MAX_TXT_COL)){
+        while(0 != pData[szIndex]){
             if(NULL == pFont){
                 writeChar(pData[szIndex]);
             }else{
@@ -545,32 +571,6 @@ KS0108Display::setPageRegister(unsigned char szY){
         }
     }else{
         throw std::invalid_argument("[Error] setPageRegister page out of range [0-7]");
-    }
-}
-
-//---------------------------------------------------
-/**
-  * setStartLine : Indicate the display data RAM displayed at the top of the screen
-  *
-  * @param szStart is the position in the line from 0 to 63
-  * @note All controllers are affected by this operation
-  *
-*/
-//---------------------------------------------------
-void
-KS0108Display::setStartLine(unsigned char szStart){
-    unsigned char szCtrl;
-
-    if(szStart < K_KS0108_X_PIXELS_PER_CTRL){
-        // Browse all controllers
-        for(szCtrl = 0; szCtrl < K_KS0108_NB_CTRL; szCtrl++){
-            // Indicate the display data RAM displayed at the top of the screen
-            // D7 D6 D5 D4 D3 D2 D1 D0
-            //  1  1  Y  Y  Y  Y  Y  Y
-            writeCommand(K_KS0108_DISPLAY_START_LINE | szStart , szCtrl);
-        }
-    }else{
-        throw std::invalid_argument("[Error] setStartLine start out of range [0-63]");
     }
 }
 
